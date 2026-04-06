@@ -5,6 +5,7 @@
 - made Rust more explicit in the public-facing README title and project snapshot
 - aligned architecture component names with the actual private implementation
 - kept the showcase positioned as a reliability-first trading system rather than a generic bot
+- added a public illustrative Rust example so visitors can immediately see the project's Rust-first architecture style
 
 ## 2026-04-05
 

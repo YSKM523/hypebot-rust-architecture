@@ -6,6 +6,7 @@
   <img src="https://img.shields.io/badge/source-private-7c2d12?style=for-the-badge" alt="Private source badge" />
   <img src="https://img.shields.io/badge/status-active%20build-14532d?style=for-the-badge" alt="Status badge" />
   <img src="https://img.shields.io/badge/lang-rust-e43717?style=for-the-badge" alt="Rust badge" />
+  <img src="https://img.shields.io/badge/runtime-tokio-0ea5e9?style=for-the-badge" alt="Tokio badge" />
   <img src="https://img.shields.io/badge/exchange-hyperliquid-1d4ed8?style=for-the-badge" alt="Hyperliquid badge" />
 </p>
 
@@ -40,6 +41,58 @@ The focus is on the parts that separate a toy bot from a serious one:
 - **Per-symbol isolation** — independent task groups so one market never contaminates another
 - **Persistent state** — local bot state restored across restarts so strategy context isn't lost
 - **Safe iteration** — dry-run mode and Discord notifications for runtime observability
+
+## Why It Feels Like Rust
+
+This project is not just "a bot that happens to be written in Rust." The system shape itself is Rust-native:
+
+- async task orchestration built around `Tokio`
+- typed event boundaries instead of loose dict passing
+- explicit `Result`-style error handling and recoverability
+- isolated runners and channels that map cleanly to long-running services
+- strategy and execution boundaries that benefit from stronger types and ownership discipline
+
+Public illustrative Rust example:
+
+- [docs/rust_showcase_example.rs](./docs/rust_showcase_example.rs)
+
+```rust
+use tokio::sync::mpsc;
+
+#[derive(Debug, Clone)]
+pub enum MarketEvent {
+    CandleClosed { symbol: String, close: f64 },
+}
+
+#[derive(Debug)]
+pub enum OrderCommand {
+    EnterLong { symbol: String, price: f64 },
+}
+
+pub struct SymbolRunner {
+    symbol: String,
+}
+
+impl SymbolRunner {
+    pub async fn run(self, mut market_rx: mpsc::Receiver<MarketEvent>, order_tx: mpsc::Sender<OrderCommand>) {
+        while let Some(event) = market_rx.recv().await {
+            match event {
+                MarketEvent::CandleClosed { close, .. } if close > 0.0 => {
+                    let _ = order_tx
+                        .send(OrderCommand::EnterLong {
+                            symbol: self.symbol.clone(),
+                            price: close,
+                        })
+                        .await;
+                }
+                _ => {}
+            }
+        }
+    }
+}
+```
+
+The private implementation is more complete than this snippet, but the architecture style is the same: typed flows, async runners, and explicit execution boundaries.
 
 ## Architecture
 
