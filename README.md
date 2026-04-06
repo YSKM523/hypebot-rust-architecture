@@ -13,22 +13,35 @@
 <p align="center">
   <a href="https://github.com/YSKM523/hypebot-rust-architecture/issues/new">Request walkthrough</a> ·
   <a href="./CHANGELOG.md">Changelog</a> ·
+  <a href="./src/lib.rs">Public Rust crate</a> ·
   <a href="https://github.com/YSKM523">@YSKM523</a>
 </p>
 
 # hypebot-rust-architecture | Rust Hyperliquid Trading Bot
 
-A public-facing showcase for a private Rust-based Hyperliquid trading bot built with production-grade architecture: typed market data pipelines, per-symbol runners, serialized order execution, persistent state, dry-run support, and long-running websocket resilience.
+A public architecture repo for a private Rust-based Hyperliquid trading system built around typed pipelines, per-symbol runners, serialized order execution, persistent state, and long-running websocket resilience.
 
-## Snapshot
+## At A Glance
 
-- Language: Rust
-- Async runtime: Tokio
-- Exchange target: Hyperliquid
-- Visibility model: private source, public showcase
-- Core pitch: reliability-first trading infrastructure rather than a toy bot script
+| Item | Value |
+|------|-------|
+| Language | Rust |
+| Async runtime | Tokio |
+| Exchange target | Hyperliquid |
+| Repo role | Public architecture repo, private implementation |
+| Core pitch | Reliability-first trading infrastructure, not a toy bot script |
 
 > The implementation repository is private. This showcase exists to share what is being built, the engineering direction, and progress — without exposing the full source.
+
+## Why Rust Matters Here
+
+Rust is part of the product quality, not just the stack label:
+
+- **Long-running reliability**: better fit for a service that stays alive through reconnects, stale feeds, order events, and runtime recovery
+- **Typed system boundaries**: commands, events, and state transitions are easier to reason about when the architecture is strongly typed
+- **Cleaner async structure**: `Tokio`, channels, and per-symbol runners map naturally onto trading-system concurrency
+- **Execution discipline**: ownership and explicit state handling help keep order flow and recovery logic coherent under stress
+- **Infrastructure credibility**: it reads like systems engineering, not like a disposable trading script
 
 ## Why This Exists
 
@@ -42,25 +55,14 @@ The focus is on the parts that separate a toy bot from a serious one:
 - **Persistent state** — local bot state restored across restarts so strategy context isn't lost
 - **Safe iteration** — dry-run mode and Discord notifications for runtime observability
 
-## Why It Feels Like Rust
+## Public Repo Surface
 
-This project is not just "a bot that happens to be written in Rust." The system shape itself is Rust-native:
+This public repo is intentionally small and architecture-led:
 
-- async task orchestration built around `Tokio`
-- typed event boundaries instead of loose dict passing
-- explicit `Result`-style error handling and recoverability
-- isolated runners and channels that map cleanly to long-running services
-- strategy and execution boundaries that benefit from stronger types and ownership discipline
-
-## Why Rust Is A Strength Here
-
-Rust is not just a branding choice for this project. It improves the fit between the codebase and the problem:
-
-- **Safer long-running runtime behavior**: fewer hidden runtime surprises for a process that is expected to stay alive across reconnects, stale feeds, and order events
-- **Stronger concurrency model**: async tasks, channels, and isolated runners map naturally onto market data, strategy, and execution pipelines
-- **Type-driven system design**: typed events and commands make it easier to reason about what can move through the system
-- **Better execution discipline**: clearer ownership and explicit state transitions help keep order flow and recovery logic coherent
-- **More credible systems engineering**: for visitors, Rust signals that this is being built as infrastructure, not just as a disposable script
+- [src/lib.rs](./src/lib.rs): a lightweight public Rust crate that shows the style of the system
+- [assets/architecture.png](./assets/architecture.png): visual overview of transport, processing, execution, and infra layers
+- [CHANGELOG.md](./CHANGELOG.md): public-facing progress log
+- [README.md](./README.md): product positioning, Rust rationale, and architectural framing
 
 Public illustrative Rust example:
 
